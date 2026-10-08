@@ -1,0 +1,34 @@
+# Скомпилированные файлы
+*.exe
+*.o
+*.obj
+*.out
+*.a
+*.so
+*.dll
+
+# Папка сборки CMake
+build/
+cmake-build-debug/
+cmake-build-release/
+
+# Файлы IDE
+.vscode/
+.vs/
+.idea/
+*.swp
+*.swo
+
+# Временные файлы
+*.tmp
+*.log
+*.bak
+
+# Файлы вывода программы
+out1.txt
+out2.txt
+*.txt
+
+# Файлы Windows
+Thumbs.db
+Desktop.ini

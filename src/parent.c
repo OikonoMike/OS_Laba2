@@ -111,6 +111,12 @@ int main() {
     si2.hStdOutput = hFile2;
     si2.hStdError = hFile2;
 
+        // Перед созданием child_1: отключаем наследование для всех хендлов, кроме hReadPipe1 и hFile1
+    SetHandleInformation(hWritePipe1, HANDLE_FLAG_INHERIT, 0);
+    SetHandleInformation(hReadPipe2, HANDLE_FLAG_INHERIT, 0);
+    SetHandleInformation(hWritePipe2, HANDLE_FLAG_INHERIT, 0);
+    SetHandleInformation(hFile2, HANDLE_FLAG_INHERIT, 0);
+
     if (!CreateProcessA(NULL, "child_1.exe", NULL, NULL, TRUE, 0, NULL, NULL, &si1, &pi1)) {
         print_error("Failed to create child_1 process");
         cleanup(hReadPipe1, hWritePipe1, hReadPipe2, hWritePipe2, 
@@ -119,6 +125,18 @@ int main() {
     }
     pi1_created = TRUE;
     printf("[Parent] child_1.exe started with PID: %lu\n", pi1.dwProcessId);
+
+    // Возвращаем наследование для всех хендлов
+    SetHandleInformation(hWritePipe1, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+    SetHandleInformation(hReadPipe2, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+    SetHandleInformation(hWritePipe2, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+    SetHandleInformation(hFile2, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+
+    // Перед созданием child_2: отключаем наследование для всех хендлов, кроме hReadPipe2 и hFile2
+    SetHandleInformation(hWritePipe2, HANDLE_FLAG_INHERIT, 0);  // child_2 не пишет в pipe2
+    SetHandleInformation(hReadPipe1, HANDLE_FLAG_INHERIT, 0);   // child_2 не читает из pipe1
+    SetHandleInformation(hWritePipe1, HANDLE_FLAG_INHERIT, 0);  // child_2 не пишет в pipe1
+    SetHandleInformation(hFile1, HANDLE_FLAG_INHERIT, 0);       // child_2 не пишет в file1
 
     if (!CreateProcessA(NULL, "child_2.exe", NULL, NULL, TRUE, 0, NULL, NULL, &si2, &pi2)) {
         print_error("Failed to create child_2 process");
@@ -130,6 +148,12 @@ int main() {
     }
     pi2_created = TRUE;
     printf("[Parent] child_2.exe started with PID: %lu\n", pi2.dwProcessId);
+
+    // Возвращаем наследование для всех хендлов
+    SetHandleInformation(hWritePipe2, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+    SetHandleInformation(hReadPipe1, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+    SetHandleInformation(hWritePipe1, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+    SetHandleInformation(hFile1, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
 
     CloseHandle(hReadPipe1);
     CloseHandle(hReadPipe2);
